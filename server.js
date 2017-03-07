@@ -1,19 +1,11 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var PORT = process.env.PORT || 3000;
-var todos = [{
-  id: 1,
-  description: "Climb Long's Peak",
-  completed: false
-}, {
-  id: 2,
-  description: 'Climb a 5.11b',
-  completed: false
-}, {
-  id: 3,
-  description: 'Sell a website',
-  completed: false
-}];
+var todos = [];
+var todoNextId = 1;
+
+app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
   res.send('Todo API Root');
@@ -31,13 +23,20 @@ app.get('/todos/:id', function(req, res) {
       matchedTodo = todo;
     }
   });
-
   if (matchedTodo) {
     res.json(matchedTodo);
   } else {
     res.status(404).send();
   }
+});
 
+app.post('/todos', function(req, res) {
+  var body = req.body;
+
+  body.id = todoNextId;
+  todoNextId++;
+  todos.push(body);
+  res.json(body);
 });
 
 app.listen(PORT, function() {
